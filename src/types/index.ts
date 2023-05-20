@@ -1,2 +1,2 @@
 export * from './products.type';
-export * from './routeNames.type';
+export * from './routeNames.enum';
