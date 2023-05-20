@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Ref, computed, inject, onMounted, reactive } from 'vue';
+import { Ref, computed, inject, onMounted, reactive, watch } from 'vue';
 
 import { type Limit, type Search } from '~src/App.vue';
 import { type TableBodyProps, type TableHeaderList } from '~src/components/DataTable/DataTable.type';
 import DataTable from '~src/components/DataTable/DataTable.vue';
 import IoIosRemoveCircle from '~src/icons/IoIosRemoveCircle.vue';
 import IoMdSettings from '~src/icons/IoMdSettings.vue';
-import { Sort } from '~src/pages/products/index.vue';
+import { type Page, type Sort } from '~src/pages/products/index.vue';
 import { getAllProducts } from '~src/services/products';
 import { type ProductList } from '~src/types';
 
@@ -17,7 +17,7 @@ interface RefDate extends TableBodyProps {
 const refData = reactive<RefDate>({ hasError: false, isLoading: false, data: null });
 
 const sort = inject('sort') as Ref<Sort>;
-const page = inject('pageNumber') as Ref<number>;
+const page = inject('page') as Ref<Page>;
 const limit = inject('limitNumber') as Ref<Limit>;
 const search = inject('search') as Ref<Search>;
 
@@ -62,10 +62,14 @@ const products = computed(() => {
 	/**
 	 * 3. Calculates the portion of the filtered and sorted products array to be displayed based on the current page and limit.
 	 **/
-	const start = (page.value - 1) * limit.value;
-	const end = limit.value * page.value;
+	const start = (page.value.current - 1) * limit.value;
+	const end = limit.value * page.value.current;
 
 	return productsList.slice(start, end);
+});
+
+watch([refData, limit], () => {
+	page.value.total = refData.data?.total ? refData.data.total / limit.value : 0;
 });
 
 onMounted(() => {
