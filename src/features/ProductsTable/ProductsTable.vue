@@ -1,29 +1,25 @@
 <script setup lang="ts">
-import { Ref, computed, inject, onMounted, provide, reactive, ref } from 'vue';
+import { Ref, computed, inject, onMounted, reactive } from 'vue';
 
 import { type Limit, type Search } from '~src/App.vue';
 import { type TableBodyProps, type TableHeaderList } from '~src/components/DataTable/DataTable.type';
 import DataTable from '~src/components/DataTable/DataTable.vue';
 import IoIosRemoveCircle from '~src/icons/IoIosRemoveCircle.vue';
 import IoMdSettings from '~src/icons/IoMdSettings.vue';
+import { Sort } from '~src/pages/products/index.vue';
 import { getAllProducts } from '~src/services/products';
-import { type ProductList, type ProductsKeys } from '~src/types';
-
-export interface Sort {
-	by: ProductsKeys;
-	type: 'asc' | 'des';
-}
+import { type ProductList } from '~src/types';
 
 interface RefDate extends TableBodyProps {
 	data: ProductList | null;
 }
 
 const refData = reactive<RefDate>({ hasError: false, isLoading: false, data: null });
-const sort = ref<Sort>({ by: 'id', type: 'asc' });
+
+const sort = inject('sort') as Ref<Sort>;
+const page = inject('pageNumber') as Ref<number>;
 const limit = inject('limitNumber') as Ref<Limit>;
-const search = inject<Ref<Search>>('search');
-const page = 1;
-provide<Ref<Sort>>('sort', sort);
+const search = inject('search') as Ref<Search>;
 
 const products = computed(() => {
 	if (!refData.data || !refData.data.products || refData.data.products.length === 0) return [];
@@ -54,7 +50,7 @@ const products = computed(() => {
 	 * 2. Filters products based on a search query.
 	 */
 	productsList = (() => {
-		if (!search?.value.by || !search.value.text) return productsList;
+		if (!search.value.by || !search.value.text) return productsList;
 
 		return productsList.filter((item) => {
 			const columnItem = item[search.value.by].toString().trim().toLowerCase();
@@ -66,8 +62,8 @@ const products = computed(() => {
 	/**
 	 * 3. Calculates the portion of the filtered and sorted products array to be displayed based on the current page and limit.
 	 **/
-	const start = (page - 1) * limit.value;
-	const end = limit.value * page;
+	const start = (page.value - 1) * limit.value;
+	const end = limit.value * page.value;
 
 	return productsList.slice(start, end);
 });

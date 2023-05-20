@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 
 import { type Limit, type Search } from '~src/App.vue';
 
-const limit = inject<Ref<Limit>>('limitNumber');
+const limit = inject('limitNumber') as Ref<Limit>;
 const search = inject('search') as Ref<Search>;
 
 const onChangeSearchText = computed(() => {
