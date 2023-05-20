@@ -1,24 +1,42 @@
 <script setup lang="ts">
+import { Ref, computed, inject } from 'vue';
+
+import { type Sort } from '~src/features/ProductsTable/ProductsTable.vue';
 import FaSortDown from '~src/icons/FaSortDown.vue';
 import FaSortUp from '~src/icons/FaSortUp.vue';
+import { type ProductsKeys } from '~src/types';
 
 import { type TableHeaderList } from './DataTable.type';
 
 const DEFAULT_CLASS =
 	'px-3 py-4 d-flex align-items-center justify-content-center gap-4 w-100 fs-6 fw-bold border-0 bg-transparent text-black rounded-0';
 
+const sort = inject('sort') as Ref<Sort>;
 defineProps<{ list: TableHeaderList[] }>();
+
+const sortHandler = computed(() => {
+	return (text: ProductsKeys) => {
+		sort.value.by = text.toLowerCase() as ProductsKeys;
+		sort.value.type = sort.value.type === 'asc' ? 'des' : 'asc';
+	};
+});
 </script>
 
 <template>
 	<thead :class="$style.thead">
 		<tr class="user-select-none">
-			<th v-for="({ text, onSort, width }, index) in list" :key="index" :style="{ width }">
-				<button v-if="onSort" type="button" :class="[DEFAULT_CLASS, $style.btnSort]" class="btn btn-light">
+			<th v-for="({ text, width, isSortable }, index) in list" :key="index" :style="{ width }">
+				<button
+					v-if="isSortable"
+					type="button"
+					:class="[DEFAULT_CLASS, $style.btnSort, { [$style.activeSort]: sort.by === text }]"
+					class="btn btn-light"
+					@click="() => sortHandler(text as ProductsKeys)"
+				>
 					{{ text }}
 					<span className="d-flex flex-column justify-content-center align-items-center sort-icons">
-						<FaSortUp />
-						<FaSortDown />
+						<FaSortUp :class="{ active: sort.type === 'asc' && sort.by === text }" />
+						<FaSortDown :class="{ active: sort.type === 'des' && sort.by === text }" />
 					</span>
 				</button>
 
@@ -33,6 +51,11 @@ defineProps<{ list: TableHeaderList[] }>();
 	:global {
 		th {
 			padding: 0;
+		}
+
+		button,
+		span {
+			text-transform: capitalize;
 		}
 	}
 }
