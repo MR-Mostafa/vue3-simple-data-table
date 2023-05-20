@@ -12,7 +12,7 @@ const props = defineProps<IProps>();
 
 <template>
 	<div class="table-responsive">
-		<table class="table table-striped table-hover table-bordered table-truncate">
+		<table :class="[$style.table, $style.tableTruncate]" class="table table-striped table-hover table-bordered">
 			<TableHeader :list="props.headerItem" />
 
 			<TableBody :is-loading="props.isLoading" :has-error="props.hasError">
@@ -24,25 +24,27 @@ const props = defineProps<IProps>();
 	</div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 @import '~src/assets/styles/responsive';
 
 .table {
 	margin: 2.5rem 0;
 	table-layout: fixed;
 
-	tr {
-		border-width: 3px;
-	}
+	:global {
+		tr {
+			border-width: 3px;
+		}
 
-	td {
-		transition: all 0.2s ease-in-out;
-	}
+		td {
+			transition: all 0.2s ease-in-out;
+		}
 
-	th,
-	td {
-		vertical-align: middle;
-		line-height: 1.7;
+		th,
+		td {
+			vertical-align: middle;
+			line-height: 1.7;
+		}
 	}
 
 	@include media-breakpoint-up(lg) {
@@ -54,12 +56,14 @@ const props = defineProps<IProps>();
 	}
 } // .table
 
-.table-truncate {
-	th,
-	td {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+.tableTruncate {
+	:global {
+		th,
+		td {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
 	}
 }
 </style>

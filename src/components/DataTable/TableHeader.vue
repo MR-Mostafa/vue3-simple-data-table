@@ -11,10 +11,10 @@ defineProps<{ list: TableHeaderList[] }>();
 </script>
 
 <template>
-	<thead>
+	<thead :class="$style.thead">
 		<tr class="user-select-none">
 			<th v-for="({ text, onSort, width }, index) in list" :key="index" :style="{ width }">
-				<button v-if="onSort" type="button" :class="DEFAULT_CLASS" class="btn btn-light btn-sort">
+				<button v-if="onSort" type="button" :class="[DEFAULT_CLASS, $style.btnSort]" class="btn btn-light">
 					{{ text }}
 					<span className="d-flex flex-column justify-content-center align-items-center sort-icons">
 						<FaSortUp />
@@ -28,14 +28,16 @@ defineProps<{ list: TableHeaderList[] }>();
 	</thead>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss" module>
 .thead {
-	th {
-		padding: 0;
+	:global {
+		th {
+			padding: 0;
+		}
 	}
 }
 
-.btn-sort {
+.btnSort {
 	&:hover {
 		--bs-text-opacity: 0.7;
 	}
@@ -44,37 +46,39 @@ defineProps<{ list: TableHeaderList[] }>();
 		--bs-text-opacity: 1;
 	}
 
-	.sort-icons {
-		$dimension: 18px;
+	:global {
+		.sort-icons {
+			$dimension: 18px;
 
-		position: relative;
-		height: $dimension;
-		width: $dimension;
-		max-height: 100%;
-		transform: translateY(1px);
-		color: #b7b7b7;
-
-		svg {
-			position: absolute;
-			flex: 0 0 $dimension;
-			width: $dimension;
+			position: relative;
 			height: $dimension;
+			width: $dimension;
+			max-height: 100%;
+			transform: translateY(1px);
+			color: #b7b7b7;
 
-			&:first-child {
-				top: -1px;
-				bottom: auto;
+			svg {
+				position: absolute;
+				flex: 0 0 $dimension;
+				width: $dimension;
+				height: $dimension;
+
+				&:first-child {
+					top: -1px;
+					bottom: auto;
+				}
+
+				&:last-child {
+					top: auto;
+					bottom: 0px;
+				}
+			} // svg
+
+			.active {
+				color: #2e2e2e;
 			}
-
-			&:last-child {
-				top: auto;
-				bottom: 0px;
-			}
-		} // svg
-
-		.active {
-			color: #2e2e2e;
-		}
-	} // .sort-icons
+		} // .sort-icons
+	} // :global
 } // .btnSort
 
 .activeSort {
