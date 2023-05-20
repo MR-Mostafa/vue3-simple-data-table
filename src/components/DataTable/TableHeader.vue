@@ -16,8 +16,8 @@ defineProps<{ list: TableHeaderList[] }>();
 
 const sortHandler = computed(() => {
 	return (text: ProductsKeys) => {
-		sort.value.by = text.toLowerCase() as ProductsKeys;
-		sort.value.type = sort.value.type === 'asc' ? 'des' : 'asc';
+		sort.value.type = sort.value.type === 'asc' && sort.value.by === text ? 'des' : 'asc';
+		sort.value.by = text;
 	};
 });
 </script>
