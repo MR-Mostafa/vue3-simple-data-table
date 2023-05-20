@@ -1,3 +1,5 @@
 export enum RouteNames {
-	Products = 'products',
+	Home = 'Home',
+	Products = 'Products',
+	NotFound = 'NotFound',
 }
