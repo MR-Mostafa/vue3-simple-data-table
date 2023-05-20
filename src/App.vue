@@ -1,22 +1,31 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+import { Ref, provide, ref } from 'vue';
+
+import ProductsTable from '~src/features/ProductsTable/ProductsTable.vue';
+import productsHeader from '~src/features/ProductsTable/productsHeader.vue';
+import { ProductsKeys } from '~src/types/products.type';
+
+export type Limit = 5 | 12 | 30;
+export interface Search {
+	by: ProductsKeys;
+	text: string;
+}
+
+const limit = ref<Limit>(12);
+const search = ref<Search>({ by: 'id', text: '' });
+provide<Ref<number>>('limitNumber', limit);
+provide<Ref<Search>>('search', search);
 </script>
 
 <template>
-	<HelloWorld msg="Vite + Vue" />
+	<div class="container py-5">
+		<div class="row">
+			<div class="col-12">
+				<productsHeader />
+				<ProductsTable />
+			</div>
+		</div>
+	</div>
 </template>
 
-<style scoped>
-.logo {
-	height: 6em;
-	padding: 1.5em;
-	will-change: filter;
-	transition: filter 300ms;
-}
-.logo:hover {
-	filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-	filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<style scoped></style>
