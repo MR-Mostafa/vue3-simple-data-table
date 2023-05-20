@@ -6,7 +6,7 @@ import { RouteNames } from '~src/types';
 const router = useRouter();
 
 const handleRedirectPage = () => {
-	router.push({ name: RouteNames.Home });
+	router.push({ name: RouteNames.HomePage });
 };
 </script>
 
