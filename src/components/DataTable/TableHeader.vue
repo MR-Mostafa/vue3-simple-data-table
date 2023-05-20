@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Ref, computed, inject } from 'vue';
 
-import { type Sort } from '~src/features/ProductsTable/ProductsTable.vue';
 import FaSortDown from '~src/icons/FaSortDown.vue';
 import FaSortUp from '~src/icons/FaSortUp.vue';
+import { type Sort } from '~src/pages/products/index.vue';
 import { type ProductsKeys } from '~src/types';
 
 import { type TableHeaderList } from './DataTable.type';
