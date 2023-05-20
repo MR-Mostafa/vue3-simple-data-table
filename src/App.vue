@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Ref, provide, ref } from 'vue';
 
-import ProductsTable from '~src/features/ProductsTable/ProductsTable.vue';
-import productsHeader from '~src/features/ProductsTable/productsHeader.vue';
 import { ProductsKeys } from '~src/types/products.type';
 
 export type Limit = 5 | 12 | 30;
@@ -20,10 +18,7 @@ provide<Ref<Search>>('search', search);
 <template>
 	<div class="container py-5">
 		<div class="row">
-			<div class="col-12">
-				<productsHeader />
-				<ProductsTable />
-			</div>
+			<router-view></router-view>
 		</div>
 	</div>
 </template>
