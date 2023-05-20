@@ -3,10 +3,7 @@ import Spinner from '~src/components/Spinner/Spinner.vue';
 
 import { type TableBodyProps } from './DataTable.type';
 
-const props = withDefaults(defineProps<TableBodyProps>(), {
-	isLoading: false,
-	hasError: false,
-});
+const props = defineProps<TableBodyProps>();
 </script>
 
 <template>

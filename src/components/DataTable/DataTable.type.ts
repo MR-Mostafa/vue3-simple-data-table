@@ -1,6 +1,6 @@
 export interface TableBodyProps {
-	isLoading?: boolean;
-	hasError?: boolean;
+	isLoading: boolean;
+	hasError: boolean;
 }
 
 export interface TableHeaderList {

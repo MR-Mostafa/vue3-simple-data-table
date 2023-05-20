@@ -7,10 +7,7 @@ interface IProps extends TableBodyProps {
 	headerItem: TableHeaderList[];
 }
 
-const props = withDefaults(defineProps<IProps>(), {
-	isLoading: false,
-	hasError: false,
-});
+const props = defineProps<IProps>();
 </script>
 
 <template>
