@@ -1,20 +1,16 @@
 <script setup lang="ts">
-import { Ref, computed, inject, onMounted, reactive, watch } from 'vue';
+import { Ref, computed, inject, onMounted, watch } from 'vue';
 
 import { type Limit, type Search } from '~src/App.vue';
-import { type TableBodyProps, type TableHeaderList } from '~src/components/DataTable/DataTable.type';
+import { type TableHeaderList } from '~src/components/DataTable/DataTable.type';
 import DataTable from '~src/components/DataTable/DataTable.vue';
+import { useFetcher } from '~src/compositions';
 import IoIosRemoveCircle from '~src/icons/IoIosRemoveCircle.vue';
 import IoMdSettings from '~src/icons/IoMdSettings.vue';
 import { type Page, type Sort } from '~src/pages/products/index.vue';
-import { getAllProducts } from '~src/services/products';
 import { type ProductList } from '~src/types';
 
-interface RefDate extends TableBodyProps {
-	data: ProductList | null;
-}
-
-const refData = reactive<RefDate>({ hasError: false, isLoading: false, data: null });
+const { hasError, isLoading, data, fetcher: getAllProducts } = useFetcher<ProductList>('/products?limit=100');
 
 const sort = inject('sort') as Ref<Sort>;
 const page = inject('page') as Ref<Page>;
@@ -22,9 +18,9 @@ const limit = inject('limitNumber') as Ref<Limit>;
 const search = inject('search') as Ref<Search>;
 
 const products = computed(() => {
-	if (!refData.data || !refData.data.products || refData.data.products.length === 0) return [];
+	if (!data.value || !data.value.products || data.value.products.length === 0) return [];
 
-	let productsList = refData.data.products;
+	let productsList = data.value.products;
 
 	/**
 	 * 1. Sorts an array of products based on a specified sort key and sort type.
@@ -68,8 +64,8 @@ const products = computed(() => {
 	return productsList.slice(start, end);
 });
 
-watch([refData, limit], () => {
-	const total = refData.data?.products.length ? Math.ceil(refData.data.products.length / limit.value) : 0;
+watch([data, limit], () => {
+	const total = data.value?.products.length ? Math.ceil(data.value.products.length / limit.value) : 0;
 
 	page.value.total = total;
 
@@ -79,19 +75,7 @@ watch([refData, limit], () => {
 });
 
 onMounted(() => {
-	refData.isLoading = true;
-
-	getAllProducts<ProductList>()
-		.then((res) => {
-			refData.data = res.data;
-		})
-		.catch((err) => {
-			refData.hasError = true;
-			console.error(err);
-		})
-		.finally(() => {
-			refData.isLoading = false;
-		});
+	getAllProducts();
 });
 
 const headerItem = computed<TableHeaderList[]>(() => {
@@ -123,7 +107,7 @@ const headerItem = computed<TableHeaderList[]>(() => {
 </script>
 
 <template>
-	<DataTable :header-item="headerItem" :is-loading="refData.isLoading" :has-error="refData.hasError">
+	<DataTable :header-item="headerItem" :is-loading="isLoading" :has-error="hasError">
 		<template #data>
 			<template v-if="products.length !== 0">
 				<tr v-for="{ id, category, title, price, description } in products" :key="id">
