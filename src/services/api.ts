@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 
 export const API = axios.create({
 	baseURL: import.meta.env.GB_BASE_URL,
@@ -33,13 +33,3 @@ API.interceptors.response.use(
 		return Promise.reject(error);
 	}
 );
-
-export const getFetcher = <T>(url: string, config: AxiosRequestConfig = {}) => API.get<T>(url, config).then((res) => res);
-
-export const postFetcher = <T, D = unknown>(url: string, data: D = {} as D, config: AxiosRequestConfig = {}) =>
-	API.post<T>(url, data, config).then((res) => res);
-
-export const deleteFetcher = <T>(url: string, config: AxiosRequestConfig = {}) => API.delete<T>(url, config).then((res) => res);
-
-export const putFetcher = <T, D = unknown>(url: string, data: D = {} as D, config: AxiosRequestConfig = {}) =>
-	API.put<T>(url, data, config).then((res) => res);
