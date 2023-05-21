@@ -11,7 +11,12 @@ import { type Page, type Sort } from '~src/pages/products/index.vue';
 import { useAllProductsStore } from '~src/stores';
 import { type ProductList } from '~src/types';
 
-const { hasError, isLoading, data, fetcher: getAllProducts } = useFetcher<ProductList>('/products?limit=100');
+const {
+	hasError: hasGetAllProductsError,
+	isLoading: isGetAllProductsLoading,
+	data: allProducts,
+	fetcher: getAllProducts,
+} = useFetcher<ProductList>('/products?limit=100');
 
 const sort = inject('sort') as Ref<Sort>;
 const page = inject('page') as Ref<Page>;
@@ -69,8 +74,8 @@ const ProductsSlice = computed(() => {
 	return productsFilter.value.slice(start, end);
 });
 
-watch(data, () => {
-	allProductsStore.$patch({ data: data.value?.products || [] });
+watch(allProducts, () => {
+	allProductsStore.$patch({ data: allProducts.value?.products || [] });
 });
 
 watch([productsFilter, limit], () => {
@@ -116,7 +121,7 @@ const headerItem = computed<TableHeaderList[]>(() => {
 </script>
 
 <template>
-	<DataTable :header-item="headerItem" :is-loading="isLoading" :has-error="hasError">
+	<DataTable :header-item="headerItem" :is-loading="isGetAllProductsLoading" :has-error="hasGetAllProductsError">
 		<template #data>
 			<template v-if="ProductsSlice.length !== 0">
 				<tr v-for="{ id, category, title, price, description } in ProductsSlice" :key="id">
