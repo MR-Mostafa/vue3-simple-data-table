@@ -1,8 +1,6 @@
 import { type AxiosRequestConfig, AxiosResponse } from 'axios';
 import { reactive, ref, toRefs } from 'vue';
 
-import debounce from 'lodash/debounce';
-
 import { API } from '~src/services/api';
 
 type FetcherProps<D> = Pick<AxiosRequestConfig<D>, 'data' | 'url'>;
@@ -17,7 +15,7 @@ export const useFetcher = <R = unknown, D = unknown>(baseConfig: AxiosRequestCon
 		hasError: false,
 	});
 
-	const fetcher = debounce(async ({ url, data = {} as D }: FetcherProps<D> = {}) => {
+	const fetcher = async ({ url, data = {} as D }: FetcherProps<D> = {}) => {
 		if (!baseConfig.url && !url) {
 			throw new Error('The URL does not exist.');
 		}
@@ -33,13 +31,14 @@ export const useFetcher = <R = unknown, D = unknown>(baseConfig: AxiosRequestCon
 			state.hasError = false;
 
 			return res as AxiosResponse<R, unknown>;
-		} catch (e) {
+		} catch (err) {
 			state.hasError = true;
 			state.isSuccess = false;
+			console.error(err);
 		} finally {
 			state.isLoading = false;
 		}
-	}, 500);
+	};
 
 	return { ...toRefs(state), data: result, fetcher };
 };
