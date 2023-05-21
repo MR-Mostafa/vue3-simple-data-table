@@ -69,7 +69,13 @@ const products = computed(() => {
 });
 
 watch([refData, limit], () => {
-	page.value.total = refData.data?.total ? refData.data.total / limit.value : 0;
+	const total = refData.data?.products.length ? Math.ceil(refData.data.products.length / limit.value) : 0;
+
+	page.value.total = total;
+
+	if (page.value.current > total && page.value.total !== 0) {
+		page.value.current = total;
+	}
 });
 
 onMounted(() => {

@@ -35,7 +35,7 @@ const { queries, setQueries } = useRouteQuery<{
 
 const sortByQuery = queries.sortBy || (import.meta.env.GB_Products_sortBy as ProductsKeys);
 const sortTypeQuery = queries.sortType || (import.meta.env.GB_Products_sortType as 'asc' | 'des');
-const currentPageQuery = queries.page && +queries.page > 0 ? +queries.page : 1;
+const currentPageQuery = queries.page && +queries.page >= 1 ? +queries.page : 1;
 const limitQuery = queries.limit || (+import.meta.env.GB_Products_limit as Limit);
 const searchTextQuery = queries.searchText || '';
 const searchByQuery = queries.searchBy || 'id';
