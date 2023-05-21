@@ -1,4 +1,4 @@
-import { type AxiosRequestConfig } from 'axios';
+import { type AxiosRequestConfig, AxiosResponse } from 'axios';
 import { reactive, ref, toRefs } from 'vue';
 
 import debounce from 'lodash/debounce';
@@ -31,6 +31,8 @@ export const useFetcher = <R = unknown, D = unknown>(baseConfig: AxiosRequestCon
 			result.value = res.data;
 			state.isSuccess = true;
 			state.hasError = false;
+
+			return res as AxiosResponse<R, unknown>;
 		} catch (e) {
 			state.hasError = true;
 			state.isSuccess = false;
