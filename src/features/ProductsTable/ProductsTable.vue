@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, computed, inject, onMounted, watch } from 'vue';
+import { Ref, computed, inject, onBeforeMount, watch } from 'vue';
 
 import { type Limit, type Search } from '~src/App.vue';
 import { type TableHeaderList } from '~src/components/DataTable/DataTable.type';
@@ -8,6 +8,7 @@ import { useFetcher } from '~src/compositions';
 import IoIosRemoveCircle from '~src/icons/IoIosRemoveCircle.vue';
 import IoMdSettings from '~src/icons/IoMdSettings.vue';
 import { type Page, type Sort } from '~src/pages/products/index.vue';
+import { useAllProductsStore } from '~src/stores';
 import { type ProductList } from '~src/types';
 
 const { hasError, isLoading, data, fetcher: getAllProducts } = useFetcher<ProductList>('/products?limit=100');
@@ -16,11 +17,11 @@ const sort = inject('sort') as Ref<Sort>;
 const page = inject('page') as Ref<Page>;
 const limit = inject('limitNumber') as Ref<Limit>;
 const search = inject('search') as Ref<Search>;
+const allProductsStore = useAllProductsStore();
 
-const products = computed(() => {
-	if (!data.value || !data.value.products || data.value.products.length === 0) return [];
-
-	let productsList = data.value.products;
+const productsFilter = computed(() => {
+	if (!allProductsStore.products || allProductsStore.products.length === 0) return [];
+	let productsList = allProductsStore.products;
 
 	/**
 	 * 1. Sorts an array of products based on a specified sort key and sort type.
@@ -55,17 +56,25 @@ const products = computed(() => {
 		});
 	})();
 
+	return productsList;
+});
+
+const ProductsSlice = computed(() => {
 	/**
 	 * 3. Calculates the portion of the filtered and sorted products array to be displayed based on the current page and limit.
 	 **/
 	const start = (page.value.current - 1) * limit.value;
 	const end = limit.value * page.value.current;
 
-	return productsList.slice(start, end);
+	return productsFilter.value.slice(start, end);
 });
 
-watch([data, limit], () => {
-	const total = data.value?.products.length ? Math.ceil(data.value.products.length / limit.value) : 0;
+watch(data, () => {
+	allProductsStore.$patch({ data: data.value?.products || [] });
+});
+
+watch([productsFilter, limit], () => {
+	const total = Math.ceil(productsFilter.value.length / limit.value);
 
 	page.value.total = total;
 
@@ -74,7 +83,7 @@ watch([data, limit], () => {
 	}
 });
 
-onMounted(() => {
+onBeforeMount(() => {
 	getAllProducts();
 });
 
@@ -109,8 +118,8 @@ const headerItem = computed<TableHeaderList[]>(() => {
 <template>
 	<DataTable :header-item="headerItem" :is-loading="isLoading" :has-error="hasError">
 		<template #data>
-			<template v-if="products.length !== 0">
-				<tr v-for="{ id, category, title, price, description } in products" :key="id">
+			<template v-if="ProductsSlice.length !== 0">
+				<tr v-for="{ id, category, title, price, description } in ProductsSlice" :key="id">
 					<td className="text-center">{{ new Intl.NumberFormat('en-GB', { style: 'decimal' }).format(id) }}</td>
 					<td>{{ category }}</td>
 					<td>{{ title }}</td>
