@@ -5,16 +5,11 @@ import debounce from 'lodash/debounce';
 
 import { API } from '~src/services/api';
 
-type AxiosConfig<D> = Omit<AxiosRequestConfig<D>, 'data'>;
-type Data<D> = Pick<AxiosRequestConfig<D>, 'data'>;
+type FetcherProps<D> = Pick<AxiosRequestConfig<D>, 'data' | 'url'>;
 
 const DEFAULT_METHOD = 'get';
 
-export const useFetcher = <R = unknown, D = unknown>(url: string, config: AxiosConfig<D> = {}) => {
-	if (!url || typeof url !== 'string') {
-		throw new Error('The URL does not exist or its type is not string');
-	}
-
+export const useFetcher = <R = unknown, D = unknown>(baseConfig: AxiosRequestConfig<D> = {}) => {
 	const result = ref<R | null>(null);
 	const state = reactive({
 		isLoading: false,
@@ -22,13 +17,17 @@ export const useFetcher = <R = unknown, D = unknown>(url: string, config: AxiosC
 		hasError: false,
 	});
 
-	const newConfig: AxiosRequestConfig<D> = Object.assign({ method: DEFAULT_METHOD }, config, { url });
+	const fetcher = debounce(async ({ url, data = {} as D }: FetcherProps<D> = {}) => {
+		if (!baseConfig.url && !url) {
+			throw new Error('The URL does not exist.');
+		}
 
-	const fetcher = debounce(async (newData: Data<D> = {}) => {
 		state.isLoading = true;
 
+		const fetcherConfig = { data, url: url || baseConfig.url };
+
 		try {
-			const res = await API(Object.assign(newConfig, { data: newData }));
+			const res = await API(Object.assign({ method: DEFAULT_METHOD }, baseConfig, fetcherConfig));
 			result.value = res.data;
 			state.isSuccess = true;
 			state.hasError = false;

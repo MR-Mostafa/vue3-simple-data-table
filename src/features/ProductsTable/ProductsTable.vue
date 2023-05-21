@@ -16,7 +16,7 @@ const {
 	isLoading: isGetAllProductsLoading,
 	data: allProducts,
 	fetcher: getAllProducts,
-} = useFetcher<ProductList>('/products?limit=100');
+} = useFetcher<ProductList>({ url: '/products?limit=100' });
 
 const sort = inject('sort') as Ref<Sort>;
 const page = inject('page') as Ref<Page>;
