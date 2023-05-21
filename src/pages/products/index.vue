@@ -5,6 +5,7 @@ import Pagination from '~src/components/Pagination/Pagination.vue';
 import { useRouteQuery } from '~src/compositions';
 import ProductsTable from '~src/features/ProductsTable/ProductsTable.vue';
 import productsHeader from '~src/features/ProductsTable/productsHeader.vue';
+import { useAllProductsStore } from '~src/stores';
 import { ProductsKeys } from '~src/types/products.type';
 
 export type Limit = 5 | 12 | 30;
@@ -24,6 +25,7 @@ export interface Page {
 	total: number;
 }
 
+const allProductsStore = useAllProductsStore();
 const { queries, setQueries } = useRouteQuery<{
 	sortBy: ProductsKeys;
 	sortType: 'asc' | 'des';
@@ -96,7 +98,21 @@ const onChangePage = computed(() => {
 	<div class="col-12">
 		<div class="row">
 			<div class="col-12 col-md-6">
-				<p className="fw-bold pe-2">Total Price:</p>
+				<div className="d-flex align-items-center justify-content-start pb-3">
+					<p className="fw-bold pe-2">Total Price:</p>
+					<p>
+						{{
+							new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'USD', currencyDisplay: 'narrowSymbol' }).format(
+								allProductsStore.totalPrice
+							)
+						}}
+					</p>
+				</div>
+
+				<div className="d-flex align-items-center justify-content-start">
+					<p className="fw-bold pe-2">Total Count:</p>
+					<p>{{ new Intl.NumberFormat('en-GB', { style: 'decimal' }).format(allProductsStore.totalCount) }}</p>
+				</div>
 			</div>
 
 			<div class="col-12 col-md-6">
