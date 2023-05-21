@@ -94,6 +94,16 @@ const onChangePage = computed(() => {
 	</div>
 
 	<div class="col-12">
-		<Pagination :current-page="page.current" :start-page="page.start" :total-page="page.total" :on-change-page="onChangePage" />
+		<div class="row">
+			<div class="col-12 col-md-6">
+				<p className="fw-bold pe-2">Total Price:</p>
+			</div>
+
+			<div class="col-12 col-md-6">
+				<div className="d-flex align-items-center justify-content-end h-100">
+					<Pagination :current-page="page.current" :start-page="page.start" :total-page="page.total" :on-change-page="onChangePage" />
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
