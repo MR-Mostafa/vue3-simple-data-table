@@ -1,23 +1,22 @@
 <script setup lang="ts">
-import { Ref, computed, inject, onBeforeMount, ref, watch } from 'vue';
+import { useAxios } from '@vueuse/integrations/useAxios';
+import { Ref, computed, inject, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { type Limit, type Search } from '~src/App.vue';
 import { type TableHeaderList } from '~src/components/DataTable/DataTable.type';
 import DataTable from '~src/components/DataTable/DataTable.vue';
-import { useFetcher } from '~src/compositions';
 import ConfirmDeleteProduct from '~src/features/ProductsTable/ConfirmDeleteProduct.vue';
 import IoIosRemoveCircle from '~src/icons/IoIosRemoveCircle.vue';
 import IoMdSettings from '~src/icons/IoMdSettings.vue';
 import { type Page, type Sort } from '~src/pages/products/index.vue';
+import { API } from '~src/services/api';
 import { useAllProductsStore } from '~src/stores';
 import { ProductItem, type ProductList } from '~src/types';
 
-const {
-	hasError: hasGetAllProductsError,
-	isLoading: isGetAllProductsLoading,
-	data: allProducts,
-	fetcher: getAllProducts,
-} = useFetcher<ProductList>({ url: '/products?limit=100' });
+const router = useRouter();
+
+const { data, isLoading, error } = useAxios<ProductList>('/products?limit=100', API);
 
 const deletedProductItem = ref(null) as Ref<ProductItem | null>;
 const sort = inject('sort') as Ref<Sort>;
@@ -82,8 +81,8 @@ const handleShowHideModal = computed(() => {
 	};
 });
 
-watch(allProducts, () => {
-	allProductsStore.$patch({ data: allProducts.value?.products || [] });
+watch(data, () => {
+	allProductsStore.$patch({ data: data.value?.products || [] });
 });
 
 watch([productsFilter, limit, page], () => {
@@ -94,10 +93,6 @@ watch([productsFilter, limit, page], () => {
 	if (page.value.current > total && page.value.total !== 0) {
 		page.value.current = total;
 	}
-});
-
-onBeforeMount(() => {
-	getAllProducts();
 });
 
 const headerItem = computed<TableHeaderList[]>(() => {
@@ -129,7 +124,7 @@ const headerItem = computed<TableHeaderList[]>(() => {
 </script>
 
 <template>
-	<DataTable :header-item="headerItem" :is-loading="isGetAllProductsLoading" :has-error="hasGetAllProductsError">
+	<DataTable :header-item="headerItem" :is-loading="isLoading" :has-error="!!error">
 		<template #data>
 			<template v-if="productsSlice.length !== 0">
 				<tr v-for="({ id, category, title, price, description }, index) in productsSlice" :key="id">
@@ -145,7 +140,7 @@ const headerItem = computed<TableHeaderList[]>(() => {
 							<IoIosRemoveCircle />
 						</button>
 
-						<button class="btn btn-outline-primary border-0 px-3 fs-3 pt-0 pb-1">
+						<button class="btn btn-outline-primary border-0 px-3 fs-3 pt-0 pb-1" @click="router.push(`/products/${id}`)">
 							<IoMdSettings />
 						</button>
 					</td>

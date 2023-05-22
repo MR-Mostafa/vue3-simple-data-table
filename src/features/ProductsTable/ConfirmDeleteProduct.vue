@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { useAxios } from '@vueuse/integrations/useAxios';
 import { computed } from 'vue';
 
 import Modal from '~src/components/Modal/Modal.vue';
-import { useFetcher } from '~src/compositions';
+import { API } from '~src/services/api';
 import { useAllProductsStore } from '~src/stores';
 import { ProductItem } from '~src/types';
 
@@ -15,11 +16,11 @@ const allProductsStore = useAllProductsStore();
 
 const props = defineProps<IProps>();
 
-const { isLoading, fetcher } = useFetcher<ProductItem>({ method: 'delete' });
+const { isLoading, execute } = useAxios<ProductItem>({ method: 'delete' }, API);
 
 const handleDeleteProduct = computed(() => {
 	return (id: number) => {
-		fetcher({ url: `/products/${id}` }).then(() => {
+		execute(`/products/${id}`).then(() => {
 			const newProducts = allProductsStore.products.filter((item) => item.id !== id);
 			allProductsStore.$patch({ data: newProducts });
 			props.onCloseModal();
