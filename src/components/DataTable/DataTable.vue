@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { useSlots } from 'vue';
+
 import { type TableBodyProps, type TableHeaderList } from './DataTable.type';
 import TableBody from './TableBody.vue';
+import TableFooter from './TableFooter.vue';
 import TableHeader from './TableHeader.vue';
 
 interface IProps extends TableBodyProps {
 	headerItem: TableHeaderList[];
 }
 
+const slots = useSlots();
 const props = defineProps<IProps>();
 </script>
 
@@ -20,6 +24,12 @@ const props = defineProps<IProps>();
 					<slot name="data"></slot>
 				</template>
 			</TableBody>
+
+			<TableFooter v-if="slots.footer">
+				<template #footer>
+					<slot name="footer"></slot>
+				</template>
+			</TableFooter>
 		</table>
 	</div>
 </template>
