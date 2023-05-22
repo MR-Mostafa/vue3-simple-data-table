@@ -89,6 +89,8 @@ watch(data, () => {
 watch([productsFilter, limit, page], () => {
 	const total = Math.ceil(productsFilter.value.length / limit.value);
 
+	if (page.value.total === total) return;
+
 	page.value.total = total;
 
 	if (page.value.current > total && page.value.total !== 0) {
