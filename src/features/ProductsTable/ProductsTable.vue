@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { Ref, computed, inject, onBeforeMount, watch } from 'vue';
+import { Ref, computed, inject, onBeforeMount, ref, watch } from 'vue';
 
 import { type Limit, type Search } from '~src/App.vue';
 import { type TableHeaderList } from '~src/components/DataTable/DataTable.type';
 import DataTable from '~src/components/DataTable/DataTable.vue';
 import { useFetcher } from '~src/compositions';
+import ConfirmDeleteProduct from '~src/features/ProductsTable/ConfirmDeleteProduct.vue';
 import IoIosRemoveCircle from '~src/icons/IoIosRemoveCircle.vue';
 import IoMdSettings from '~src/icons/IoMdSettings.vue';
 import { type Page, type Sort } from '~src/pages/products/index.vue';
 import { useAllProductsStore } from '~src/stores';
-import { type ProductList } from '~src/types';
+import { ProductItem, type ProductList } from '~src/types';
 
 const {
 	hasError: hasGetAllProductsError,
@@ -18,6 +19,7 @@ const {
 	fetcher: getAllProducts,
 } = useFetcher<ProductList>({ url: '/products?limit=100' });
 
+const deletedProductItem = ref(null) as Ref<ProductItem | null>;
 const sort = inject('sort') as Ref<Sort>;
 const page = inject('page') as Ref<Page>;
 const limit = inject('limitNumber') as Ref<Limit>;
@@ -64,7 +66,7 @@ const productsFilter = computed(() => {
 	return productsList;
 });
 
-const ProductsSlice = computed(() => {
+const productsSlice = computed(() => {
 	/**
 	 * 3. Calculates the portion of the filtered and sorted products array to be displayed based on the current page and limit.
 	 **/
@@ -74,11 +76,17 @@ const ProductsSlice = computed(() => {
 	return productsFilter.value.slice(start, end);
 });
 
+const handleShowHideModal = computed(() => {
+	return (product?: ProductItem) => {
+		deletedProductItem.value = product && product.id ? product : null;
+	};
+});
+
 watch(allProducts, () => {
 	allProductsStore.$patch({ data: allProducts.value?.products || [] });
 });
 
-watch([productsFilter, limit], () => {
+watch([productsFilter, limit, page], () => {
 	const total = Math.ceil(productsFilter.value.length / limit.value);
 
 	page.value.total = total;
@@ -123,8 +131,8 @@ const headerItem = computed<TableHeaderList[]>(() => {
 <template>
 	<DataTable :header-item="headerItem" :is-loading="isGetAllProductsLoading" :has-error="hasGetAllProductsError">
 		<template #data>
-			<template v-if="ProductsSlice.length !== 0">
-				<tr v-for="{ id, category, title, price, description } in ProductsSlice" :key="id">
+			<template v-if="productsSlice.length !== 0">
+				<tr v-for="({ id, category, title, price, description }, index) in productsSlice" :key="id">
 					<td className="text-center">{{ new Intl.NumberFormat('en-GB', { style: 'decimal' }).format(id) }}</td>
 					<td>{{ category }}</td>
 					<td>{{ title }}</td>
@@ -133,7 +141,7 @@ const headerItem = computed<TableHeaderList[]>(() => {
 					</td>
 					<td>{{ description }}</td>
 					<td className="text-center">
-						<button class="btn btn-outline-danger border-0 px-3 fs-3 pt-0 pb-1 me-1">
+						<button class="btn btn-outline-danger border-0 px-3 fs-3 pt-0 pb-1 me-1" @click="handleShowHideModal(productsSlice[index])">
 							<IoIosRemoveCircle />
 						</button>
 
@@ -145,4 +153,6 @@ const headerItem = computed<TableHeaderList[]>(() => {
 			</template>
 		</template>
 	</DataTable>
+
+	<ConfirmDeleteProduct :product-item="deletedProductItem" :on-close-modal="handleShowHideModal" />
 </template>
