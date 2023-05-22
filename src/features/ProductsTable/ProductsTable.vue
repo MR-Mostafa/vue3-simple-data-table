@@ -14,6 +14,8 @@ import { API } from '~src/services/api';
 import { useAllProductsStore } from '~src/stores';
 import { ProductItem, type ProductList } from '~src/types';
 
+import InsertNewProducts from './InsertNewProducts.vue';
+
 const router = useRouter();
 
 const allProductsStore = useAllProductsStore();
@@ -149,6 +151,10 @@ const headerItem = computed<TableHeaderList[]>(() => {
 					</td>
 				</tr>
 			</template>
+		</template>
+
+		<template #footer>
+			<InsertNewProducts />
 		</template>
 	</DataTable>
 
