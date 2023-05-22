@@ -13,7 +13,7 @@ const router = useRouter();
 const product = ref<ProductItem>();
 const allProductsStore = useAllProductsStore();
 const { execute: getProduct } = useAxios<ProductItem>(API);
-const { execute: updateProduct } = useAxios<ProductItem>({ method: 'put' }, API);
+const { isLoading, execute: updateProduct } = useAxios<ProductItem>({ method: 'put' }, API);
 
 const handleUpdateInput = computed(() => {
 	return (e: Event) => {
@@ -126,11 +126,25 @@ onBeforeMount(() => {
 
 		<div class="col">
 			<div class="d-flex aligns-items-center justify-content-end gap-3 pt-3">
-				<button type="button" class="border-1 border-secondary border-opacity-50 btn btn-light" @click="redirectToProductsPage">
+				<button
+					type="button"
+					class="border-1 border-secondary border-opacity-50 btn btn-light"
+					:disabled="isLoading"
+					@click="redirectToProductsPage"
+				>
 					Skip
 				</button>
 
-				<button type="button" class="btn btn-primary" @click="handleUpdateProduct">Save &amp; Continue</button>
+				<button type="button" class="position-relative btn btn-primary" :disabled="isLoading" @click="handleUpdateProduct">
+					<span
+						v-if="isLoading"
+						class="spinner-border spinner-border-sm fs-6 position-absolute top-0 start-0 end-0 bottom-0 m-auto"
+						role="status"
+						aria-hidden="true"
+					></span>
+
+					<span :class="{ 'opacity-0': isLoading }">Save &amp; Continue</span>
+				</button>
 			</div>
 		</div>
 	</template>
