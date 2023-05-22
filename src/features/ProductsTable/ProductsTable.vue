@@ -16,14 +16,15 @@ import { ProductItem, type ProductList } from '~src/types';
 
 const router = useRouter();
 
-const { data, isLoading, error } = useAxios<ProductList>('/products?limit=100', API);
+const allProductsStore = useAllProductsStore();
+
+const { data, isLoading, error } = useAxios<ProductList>(allProductsStore.products.length === 0 ? '/products?limit=100' : '', API);
 
 const deletedProductItem = ref(null) as Ref<ProductItem | null>;
 const sort = inject('sort') as Ref<Sort>;
 const page = inject('page') as Ref<Page>;
 const limit = inject('limitNumber') as Ref<Limit>;
 const search = inject('search') as Ref<Search>;
-const allProductsStore = useAllProductsStore();
 
 const productsFilter = computed(() => {
 	if (!allProductsStore.products || allProductsStore.products.length === 0) return [];
