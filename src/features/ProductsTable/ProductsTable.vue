@@ -88,17 +88,21 @@ watch(data, () => {
 	allProductsStore.$patch({ data: data.value?.products || [] });
 });
 
-watch([productsFilter, limit, page], () => {
-	const total = Math.ceil(productsFilter.value.length / limit.value);
+watch(
+	[productsFilter, limit, page],
+	() => {
+		const total = Math.ceil(productsFilter.value.length / limit.value);
 
-	if (page.value.total === total) return;
+		if (page.value.total === total) return;
 
-	page.value.total = total;
+		page.value.total = total;
 
-	if (page.value.current > total && page.value.total !== 0) {
-		page.value.current = total;
-	}
-});
+		if (page.value.current > total && page.value.total !== 0) {
+			page.value.current = total;
+		}
+	},
+	{ immediate: true }
+);
 
 const headerItem = computed<TableHeaderList[]>(() => {
 	return [

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, computed, onMounted, provide, ref, watch } from 'vue';
+import { Ref, computed, provide, ref, watch } from 'vue';
 
 import Pagination from '~src/components/Pagination/Pagination.vue';
 import { useRouteQuery } from '~src/compositions';
@@ -51,20 +51,6 @@ provide<Ref<Sort>>('sort', sort);
 provide<Ref<Page>>('page', page);
 provide<Ref<number>>('limitNumber', limit);
 provide<Ref<Search>>('search', search);
-
-onMounted(() => {
-	if (allProductsStore.products.length === 0) return;
-
-	const total = Math.ceil(allProductsStore.products.length / limit.value);
-
-	if (page.value.total === total) return;
-
-	page.value.total = total;
-
-	if (page.value.current > total && page.value.total !== 0) {
-		page.value.current = total;
-	}
-});
 
 watch([sort.value], () => {
 	setQueries({
