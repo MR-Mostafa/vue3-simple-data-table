@@ -2,7 +2,7 @@
 import { Ref, computed, provide, ref, watch } from 'vue';
 
 import Pagination from '~src/components/Pagination/Pagination.vue';
-import { useRouteQuery } from '~src/compositions';
+import { useRouteQuery } from '~src/composables';
 import ProductsTable from '~src/features/ProductsTable/ProductsTable.vue';
 import productsHeader from '~src/features/ProductsTable/productsHeader.vue';
 import { useAllProductsStore } from '~src/stores';
